@@ -210,11 +210,7 @@ contract BridgeAssist is
             toUser,
             CURRENT_CHAIN(),
             toChain,
-            // amount emitted is different than amount in the struct
-            // because this is the amount that actually gets sent on this chain
-            // it doesn't matter that much anyways since you can always get
-            // the exchangeRate and do all the calculations yourself
-            (amount - currentFee),
+            (amount - currentFee * exchangeRate),
             exchangeRate
         );
 
@@ -322,23 +318,13 @@ contract BridgeAssist is
         require(chains.length == exchangeRatesFromPow.length, 'bad input');
 
         for (uint256 i; i < chains.length; ) {
-            require(
-                availableChainsToSend.add(bytes32(bytes(chains[i]))),
-                'Chain is already in the list'
-            );
-
             bytes32 chain = bytes32(bytes(chains[i]));
+            availableChainsToSend.add(chain);
+
             // implicitly reverts on overflow
             uint256 exchangeRate = 10 ** exchangeRatesFromPow[i];
+            exchangeRateFrom[chain] = exchangeRate;
 
-            if (exchangeRateFrom[chain] != 0) {
-                require(
-                    exchangeRateFrom[chain] == exchangeRate,
-                    'cannot modify the exchange rate'
-                );
-            } else {
-                exchangeRateFrom[chain] = exchangeRate;
-            }
             unchecked {
                 ++i;
             }
@@ -383,10 +369,12 @@ contract BridgeAssist is
         string[] calldata chains
     ) external onlyRole(MANAGER_ROLE) {
         for (uint256 i; i < chains.length; ) {
+            bytes32 chain = bytes32(bytes(chains[i]));
             require(
-                availableChainsToSend.remove(bytes32(bytes(chains[i]))),
+                availableChainsToSend.remove(chain),
                 'Chain is not in the list yet'
             );
+            exchangeRateFrom[chain] = 0;
             unchecked {
                 ++i;
             }
@@ -580,7 +568,7 @@ contract BridgeAssist is
         bytes32 source
     ) private pure returns (string memory result) {
         uint8 length = 0;
-        while (source[length] != 0 && length < 32) {
+        while (length < 32 && source[length] != 0) {
             length++;
         }
         assembly {
