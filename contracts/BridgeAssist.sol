@@ -134,6 +134,8 @@ contract BridgeAssist is
         require(relayerConsensusThreshold_ <= relayers_.length, 'N-of-N');
 
         for (uint256 i = 0; i < relayers_.length; ) {
+            require(relayers_[i] != address(0), 'Zero relayers');
+
             for (uint256 j = 0; j < relayers_.length; ) {
                 require(
                     i == j || relayers_[i] != relayers_[j],
@@ -345,6 +347,8 @@ contract BridgeAssist is
         require(relayerConsensusThreshold_ <= relayers_.length, 'N-of-N');
 
         for (uint256 i = 0; i < relayers_.length; ) {
+            require(relayers_[i] != address(0), 'Zero relayers');
+
             for (uint256 j = 0; j < relayers_.length; ) {
                 require(
                     i == j || relayers_[i] != relayers_[j],

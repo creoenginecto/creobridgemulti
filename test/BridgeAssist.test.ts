@@ -46,6 +46,7 @@ const ERROR = {
   ZeroOfN: '0-of-N',
   NOfN: 'N-of-N',
   DuplicateRelayers: 'Duplicate relayers',
+  ZeroRelayers: 'Zero relayers',
 }
 
 const feePercent = 1000 // eq 1000 / 10000 = 10%
@@ -239,6 +240,21 @@ describe('BridgeAssist contract', () => {
           1
         )
     ).to.be.revertedWith(ERROR.DuplicateRelayers)
+
+    await expect(
+      bridgeFactory
+        .connect(bridgeCreator)
+        .createBridgeAssist(
+          token.address,
+          ethers.utils.parseEther('100'),
+          deployer.address,
+          0,
+          0,
+          deployer.address,
+          [relayer.address, deployer.address, ethers.constants.AddressZero],
+          1
+        )
+    ).to.be.revertedWith(ERROR.ZeroRelayers)
 
     await expect(
       bridgeFactory
@@ -848,6 +864,14 @@ describe('BridgeAssist contract', () => {
         .connect(deployer)
         .setRelayers([user.address, deployer.address, user.address], 1)
     ).to.be.revertedWith(ERROR.DuplicateRelayers)
+    await expect(
+      bridge
+        .connect(deployer)
+        .setRelayers(
+          [user.address, deployer.address, ethers.constants.AddressZero],
+          1
+        )
+    ).to.be.revertedWith(ERROR.ZeroRelayers)
     await expect(
       bridge.connect(deployer).setRelayers([deployer.address], 0)
     ).to.be.revertedWith(ERROR.ZeroOfN)
