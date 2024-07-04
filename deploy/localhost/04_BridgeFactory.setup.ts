@@ -9,7 +9,9 @@ const func = setup('BridgeFactory', async () => {
   const bridgeFactory = await ethers.getContract<BridgeFactory>('BridgeFactory')
 
   const creatorRole = await bridgeFactory.CREATOR_ROLE()
+  const ownerRole = await bridgeFactory.BRIDGE_OWNER_ROLE()
   await bridgeFactory.connect(deployer).grantRole(creatorRole, bridgeCreator.address)
+  await bridgeFactory.connect(deployer).grantRole(ownerRole, deployer.address)
 })
 export default func
 

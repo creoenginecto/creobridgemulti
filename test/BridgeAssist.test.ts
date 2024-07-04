@@ -47,6 +47,8 @@ const ERROR = {
   NOfN: 'N-of-N',
   DuplicateRelayers: 'Duplicate relayers',
   ZeroRelayers: 'Zero relayers',
+  NotWhitelisted: 'Owner not whitelisted',
+  ZeroOwner: 'Owner is zero address',
 }
 
 const feePercent = 1000 // eq 1000 / 10000 = 10%
@@ -110,6 +112,18 @@ export async function signHashedTransaction(
   return signer._signTypedData(domain, types, transaction)
 }
 
+async function disableInitializer(contract: string) {
+  const INITIALIZERS_SLOT = 0
+  const value = ethers.utils.hexlify(
+      ethers.utils.zeroPad(BigNumber.from(0)._hex, 32)
+  )
+  await ethers.provider.send('hardhat_setStorageAt', [
+      contract,
+      ethers.utils.hexValue(INITIALIZERS_SLOT),
+      value,
+  ])
+}
+
 describe('BridgeAssist contract', () => {
   beforeEach(async () => {
     await deploy()
@@ -163,7 +177,7 @@ describe('BridgeAssist contract', () => {
           [relayer.address],
           1
         )
-    ).to.be.revertedWith('Owner is zero address')
+    ).to.be.revertedWith(ERROR.NotWhitelisted)
 
     await expect(
       bridgeFactory
@@ -285,6 +299,21 @@ describe('BridgeAssist contract', () => {
           2
         )
     ).to.be.revertedWith(ERROR.NOfN)
+
+    const factory = await ethers.getContractFactory<BridgeAssist__factory>('BridgeAssist')
+    const newBridge = await factory.deploy()
+    await disableInitializer(newBridge.address)
+
+    await expect(newBridge.initialize(token.address,
+      ethers.utils.parseEther('100'),
+      deployer.address,
+      0,
+      0,
+      ethers.constants.AddressZero,
+      [relayer.address],
+      1
+    )).to.be.revertedWith(ERROR.ZeroOwner)
+
   })
   it('Re-initialize should revert', async () => {
     const { bridge, token } = await useContracts()

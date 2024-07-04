@@ -23,6 +23,8 @@ contract BridgeFactory is AccessControlUpgradeable {
     }
 
     bytes32 public constant CREATOR_ROLE = keccak256('CREATOR_ROLE');
+    bytes32 public constant BRIDGE_OWNER_ROLE = keccak256('BRIDGE_OWNER_ROLE');
+
     uint256 public constant ADD_REMOVE_LIMIT_PER_TIME = 100;
 
     address public bridgeAssistImplementation;
@@ -89,6 +91,7 @@ contract BridgeFactory is AccessControlUpgradeable {
         address[] memory relayers,
         uint256 relayerConsensusThreshold
     ) external onlyRole(CREATOR_ROLE) returns (address bridge) {
+        require(hasRole(BRIDGE_OWNER_ROLE, owner), 'Owner not whitelisted');
         bridge = ClonesUpgradeable.clone(bridgeAssistImplementation);
         IBridgeAssist(bridge).initialize(
             token,
@@ -222,7 +225,10 @@ contract BridgeFactory is AccessControlUpgradeable {
         uint256 limit
     ) external view returns (BridgeAssistInfo[] memory) {
         require(limit != 0, 'Limit: zero');
-        require(offset + limit <= _createdBridges.length(), 'Invalid offset-limit');
+        require(
+            offset + limit <= _createdBridges.length(),
+            'Invalid offset-limit'
+        );
 
         BridgeAssistInfo[] memory bridgesInfo = new BridgeAssistInfo[](limit);
 
@@ -277,7 +283,10 @@ contract BridgeFactory is AccessControlUpgradeable {
     ) external view returns (address[] memory) {
         require(token != address(0), 'Token: zero address');
         require(limit != 0, 'Limit: zero');
-        require(offset + limit <= _bridgesByToken[token].length(), 'Invalid offset-limit');
+        require(
+            offset + limit <= _bridgesByToken[token].length(),
+            'Invalid offset-limit'
+        );
 
         address[] memory bridges = new address[](limit);
 

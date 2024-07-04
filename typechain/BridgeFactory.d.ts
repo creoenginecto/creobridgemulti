@@ -22,6 +22,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface BridgeFactoryInterface extends ethers.utils.Interface {
   functions: {
     "ADD_REMOVE_LIMIT_PER_TIME()": FunctionFragment;
+    "BRIDGE_OWNER_ROLE()": FunctionFragment;
     "CREATOR_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "addBridgeAssists(address[])": FunctionFragment;
@@ -46,6 +47,10 @@ interface BridgeFactoryInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "ADD_REMOVE_LIMIT_PER_TIME",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "BRIDGE_OWNER_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -140,6 +145,10 @@ interface BridgeFactoryInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "ADD_REMOVE_LIMIT_PER_TIME",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "BRIDGE_OWNER_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -306,6 +315,8 @@ export class BridgeFactory extends BaseContract {
   functions: {
     ADD_REMOVE_LIMIT_PER_TIME(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    BRIDGE_OWNER_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     CREATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
@@ -412,6 +423,8 @@ export class BridgeFactory extends BaseContract {
 
   ADD_REMOVE_LIMIT_PER_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
+  BRIDGE_OWNER_ROLE(overrides?: CallOverrides): Promise<string>;
+
   CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -515,6 +528,8 @@ export class BridgeFactory extends BaseContract {
 
   callStatic: {
     ADD_REMOVE_LIMIT_PER_TIME(overrides?: CallOverrides): Promise<BigNumber>;
+
+    BRIDGE_OWNER_ROLE(overrides?: CallOverrides): Promise<string>;
 
     CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -733,6 +748,8 @@ export class BridgeFactory extends BaseContract {
   estimateGas: {
     ADD_REMOVE_LIMIT_PER_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
+    BRIDGE_OWNER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     CREATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -842,6 +859,8 @@ export class BridgeFactory extends BaseContract {
     ADD_REMOVE_LIMIT_PER_TIME(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    BRIDGE_OWNER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     CREATOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -75,6 +75,9 @@ describe('BridgeFactory contract', () => {
         await ethers.getSigners()
 
       const defaultAdminRole = await bridgeFactory.DEFAULT_ADMIN_ROLE()
+      const ownerRole = await bridgeFactory.BRIDGE_OWNER_ROLE()
+
+      await bridgeFactory.grantRole(ownerRole, bridgeCreator.address)
 
       const bridgeAddr = await bridgeFactory
         .connect(bridgeCreator)
